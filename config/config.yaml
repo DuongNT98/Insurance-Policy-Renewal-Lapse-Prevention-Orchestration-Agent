@@ -1,0 +1,22 @@
+# Runtime parameters — loaded by AgentRegistry, passed as Graph(config=...).
+# This is a SEPARATE file from config/agent.yaml (the static manifest): agent.yaml
+# is AgentRegistry's discovery entry point, this file is the agent's own runtime
+# config, keyed by whatever your Graph/node code reads via self.config.get(...).
+# See the framework's manifest-schema reference for the agent.yaml / config.yaml
+# split of responsibility.
+
+max_retry: 3
+timeout_s: 30
+
+# 保険業法 第300条 (misleading solicitation prohibition) compliance gate: annual
+# premium threshold (JPY) above which the retention offer MUST pass the D6 HITL
+# review before dispatch — see docs/02_design.md.
+high_value_premium_threshold_jpy: 500000
+
+# HITL (D6 interrupt() pattern) — mandatory for this template: HITLGateNode
+# suspends high-value offers for human review. memory_enabled is mandatory
+# whenever hitl.enabled: true (a checkpointer is required to suspend/resume).
+memory_enabled: true
+hitl:
+  enabled: true
+  max_hitl: 8

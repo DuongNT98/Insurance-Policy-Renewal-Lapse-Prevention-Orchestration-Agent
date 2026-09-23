@@ -1,0 +1,47 @@
+[project]
+name = "ins-c2-056"
+version = "0.1.0"
+description = "Insurance Policy Renewal & Lapse Prevention Orchestration Agent — AgentCore Template"
+requires-python = ">=3.11"
+# The framework (agenticstar-agentcore) is NOT a public-PyPI dependency; it is
+# provided by CI per repo arm — a local stub module on PYTHONPATH for
+# stub-era repos, or installed from the package registry for wheel-era repos
+# (see the dual-mode run-tests CI job). Pinning it here would make
+# `pip install -e .` fail because it is not resolvable from the default index.
+dependencies = [
+    "agenticstar-agentcore[marketplace,openai]==1.0.3","pyyaml==6.0.1"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-cov==5.0.0",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.4.4",
+    "mypy==1.10.0",
+]
+
+[build-system]
+requires = ["setuptools==68.2.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+# agenticstar-agentcore ships no py.typed marker for framework/shared, so every
+# `from framework...`/`from shared...` import resolves to Any under strict mode,
+# which then cascades into disallow_subclassing_any errors for every node/graph
+# class in src/ (they all inherit a framework base class). Verified fix (not a
+# workaround): confirmed against another template's SDK reintegration on a real
+# CI pipeline run.
+[[tool.mypy.overrides]]
+module = ["framework.*", "shared.*", "yaml"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "src.*"
+disallow_subclassing_any = false

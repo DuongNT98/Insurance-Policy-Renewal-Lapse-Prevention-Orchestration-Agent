@@ -1,0 +1,57 @@
+# Retention offer matrix — 保険業法 第300条 (misleading-solicitation) control.
+#
+# S-5 compliance boundary: RetentionOfferSelectNode MUST select the `offer_id` /
+# `offer_type` / `benefit_summary` for a policyholder EXCLUSIVELY from this file.
+# The LLM (ContentGenerateNode) is only permitted to phrase the *message copy*
+# around an offer already selected here — it must never invent an offer_id,
+# a discount amount, or a guarantee not listed below.
+#
+# churn_risk_tier: low | medium | high  (set by ChurnScoreNode)
+# premium_tier:    standard | high_value (set by RetentionOfferSelectNode from
+#                  agent.yaml config.high_value_premium_threshold_jpy)
+
+offers:
+  - offer_id: "benefit_reminder_standard"
+    offer_type: "benefit_reminder"
+    churn_risk_tier: "low"
+    premium_tier: "standard"
+    benefit_summary: "Reminder of existing policy benefits and renewal continuity (no new discount)."
+    max_discount_pct: 0
+
+  - offer_id: "premium_reduction_medium"
+    offer_type: "premium_reduction"
+    churn_risk_tier: "medium"
+    premium_tier: "standard"
+    benefit_summary: "Premium reduction option via payment-plan adjustment or rider review."
+    max_discount_pct: 5
+
+  - offer_id: "premium_reduction_high"
+    offer_type: "premium_reduction"
+    churn_risk_tier: "high"
+    premium_tier: "standard"
+    benefit_summary: "Premium reduction option plus loyalty adjustment for long-tenure policyholders."
+    max_discount_pct: 10
+
+  - offer_id: "agent_visit_high_value_medium"
+    offer_type: "agent_visit"
+    churn_risk_tier: "medium"
+    premium_tier: "high_value"
+    benefit_summary: "Dedicated agent visit to review coverage fit and renewal terms."
+    max_discount_pct: 5
+
+  - offer_id: "agent_visit_high_value_high"
+    offer_type: "agent_visit"
+    churn_risk_tier: "high"
+    premium_tier: "high_value"
+    benefit_summary: "Priority agent visit with coverage review and retention consultation."
+    max_discount_pct: 10
+
+# Fallback offer used when no (churn_risk_tier, premium_tier) combination matches
+# above — still a real, pre-approved offer, never LLM-invented.
+default_offer:
+  offer_id: "benefit_reminder_default"
+  offer_type: "benefit_reminder"
+  churn_risk_tier: "low"
+  premium_tier: "standard"
+  benefit_summary: "Reminder of existing policy benefits and renewal continuity (no new discount)."
+  max_discount_pct: 0
